@@ -1,4 +1,5 @@
 from constants import ROOMS
+from utils import random_event
 
 
 def show_inventory(game_state):
@@ -12,29 +13,18 @@ def show_inventory(game_state):
     else:
         print("\nВаш инвентарь пуст.")
 
-
-def get_input(prompt="> "):
-    """Получает ввод от пользователя с обработкой ошибок"""
-    try:
-        user_input = input(prompt).strip().lower()
-        return user_input
-    except (KeyboardInterrupt, EOFError):
-        print("\nВыход из игры.")
-        return "quit"
-
-
 def move_player(game_state, direction):
     """Перемещает игрока в указанном направлении"""
     current_room_name = game_state['current_room']
     current_room = ROOMS[current_room_name]
 
     if direction in current_room['exits']:
-        # Обновляем текущую комнату
         game_state['current_room'] = current_room['exits'][direction]
-        # Увеличиваем счетчик шагов
         game_state['steps_taken'] += 1
 
         print(f"\nВы пошли {direction}...")
+        game_state = random_event(game_state)
+
         return True
     else:
         print("Нельзя пойти в этом направлении.")
@@ -45,18 +35,15 @@ def take_item(game_state, item_name):
     """Позволяет игроку подобрать предмет"""
     current_room_name = game_state['current_room']
     current_room = ROOMS[current_room_name]
-    
-    # Проверяем, не пытается ли игрок взять сундук
+
     if item_name == 'treasure_chest':
         print("Вы не можете поднять сундук, он слишком тяжелый.")
         return False
-    
+
     if item_name in current_room['items']:
-        # Добавляем предмет в инвентарь
         game_state['player_inventory'].append(item_name)
-        # Удаляем предмет из комнаты
         current_room['items'].remove(item_name)
-        
+
         print(f"Вы подняли: {item_name}")
         return True
     else:
@@ -72,7 +59,6 @@ def use_item(game_state, item_name):
         print("У вас нет такого предмета.")
         return False
 
-    # Уникальные действия для каждого предмета
     if item_name == 'torch':
         print("Вы зажгли факел. Стало светлее!")
 

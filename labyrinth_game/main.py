@@ -1,11 +1,12 @@
 from player_actions import (
-    get_input,
+    # get_input,
     move_player,
     show_inventory,
     take_item,
     use_item,
 )
 from utils import (
+    get_input,
     attempt_open_treasure,
     describe_current_room,
     solve_puzzle,
@@ -93,10 +94,8 @@ def main():
     print("Добро пожаловать в Лабиринт сокровищ!")
     print("=" * 40)
 
-    # Описание стартовой комнаты
     describe_current_room(game_state)
 
-    # Основной игровой цикл
     while not game_state['game_over']:
         print("\nЧто вы хотите сделать?")
         print(
@@ -107,10 +106,14 @@ def main():
         command = get_input()
         process_command(game_state, command)
 
-    # Сообщение после завершения игры
     if game_state['steps_taken'] > 0:
         print(f"\nИгра завершена! Вы сделали {game_state['steps_taken']} шагов.")
 
 
 if __name__ == "__main__":
     main()
+
+    # # test pseudo_random
+    # for i in range(5):
+    #     print(f"{pseudo_random(i, 35)}")
+    #     print("==============")

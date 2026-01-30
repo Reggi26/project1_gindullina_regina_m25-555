@@ -12,6 +12,7 @@ from utils import (
     solve_puzzle,
     show_help
 )
+from constants import COMMANDS
 
 # Состояние игры
 game_state = {
@@ -20,8 +21,6 @@ game_state = {
     'game_over': False,  # Значения окончания игры
     'steps_taken': 0  # Количество шагов
 }
-
-
 def process_command(game_state, command):
     """Обрабатывает команды пользователя"""
     parts = command.split()
@@ -33,7 +32,7 @@ def process_command(game_state, command):
 
     match main_command:
         case 'show_help':
-            show_help()
+            show_help(COMMANDS)
             print('Что вы хотите сделать?')
             command = get_input()
             process_command(game_state, command)
@@ -63,7 +62,8 @@ def process_command(game_state, command):
                 print("Укажите предмет для использования.")
 
         case 'solve':
-            if game_state['current_room'] == 'treasure_room':
+            current_room = game_state['current_room']
+            if current_room == 'treasure_room':
                 attempt_open_treasure(game_state)
             else:
                 solve_puzzle(game_state)
@@ -87,9 +87,7 @@ def process_command(game_state, command):
                 "take [предмет], use [предмет], solve, open, inventory, quit"
             )
 
-
 def main():
-
     """Основная функция игры"""
     print("Добро пожаловать в Лабиринт сокровищ!")
     print("=" * 40)

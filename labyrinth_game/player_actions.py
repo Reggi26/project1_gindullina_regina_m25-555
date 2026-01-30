@@ -1,7 +1,5 @@
 from constants import ROOMS
 from utils import random_event
-
-
 def show_inventory(game_state):
     """Показывает инвентарь игрока"""
     inventory = game_state['player_inventory']
@@ -12,24 +10,34 @@ def show_inventory(game_state):
             print(f"  - {item}")
     else:
         print("\nВаш инвентарь пуст.")
-
 def move_player(game_state, direction):
     """Перемещает игрока в указанном направлении"""
     current_room_name = game_state['current_room']
     current_room = ROOMS[current_room_name]
 
     if direction in current_room['exits']:
-        game_state['current_room'] = current_room['exits'][direction]
+        target_room = current_room['exits'][direction]
+
+        if target_room == 'treasure_room':
+            inventory = game_state['player_inventory']
+
+            if 'rusty_key' in inventory:
+                print("Вы используете найденный ключ, чтобы открыть путь в комнату сокровищ.")
+            else:
+                print("Дверь заперта. Нужен ключ, чтобы пройти дальше.")
+                return False
+
+        game_state['current_room'] = target_room
         game_state['steps_taken'] += 1
 
         print(f"\nВы пошли {direction}...")
+
         game_state = random_event(game_state)
 
         return True
     else:
         print("Нельзя пойти в этом направлении.")
         return False
-
 
 def take_item(game_state, item_name):
     """Позволяет игроку подобрать предмет"""

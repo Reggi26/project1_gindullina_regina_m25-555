@@ -1,4 +1,4 @@
-from constants import ROOMS
+from constants import ROOMS, COMMANDS
 import math
 
 def get_input(prompt="> "):
@@ -31,35 +31,53 @@ def describe_current_room(game_state):
     if room['puzzle'] is not None:
         print("\nКажется, здесь есть загадка (используйте команду solve).")
 
-
 def solve_puzzle(game_state):
     """Функция решения загадок"""
     current_room_name = game_state['current_room']
     room = ROOMS[current_room_name]
-    
+
     if room['puzzle'] is None:
         print("Загадок здесь нет.")
         return
-    
+
     question, correct_answer = room['puzzle']
-    
+
     print(f"\n{question}")
-    user_answer = get_input("Ваш ответ: ")
-    
-    if user_answer.lower() == correct_answer.lower():
+    user_answer = get_input("Ваш ответ: ").strip().lower()
+
+    correct_variants = [correct_answer.lower()]
+
+    if correct_answer == '10':
+        correct_variants.extend(['десять', '10'])
+    elif correct_answer == '7':
+        correct_variants.extend(['семь', '7'])
+    elif correct_answer == '2*5':
+        correct_variants.extend(['2*5', '2 * 5', 'два умножить на пять', 'десять'])
+
+    if user_answer in correct_variants:
         print("Верно! Загадка решена!")
         room['puzzle'] = None
-        
-        if current_room_name == 'treasure_room':
+
+        if current_room_name in {'treasure_room', 'secret_room'}:
             print("Вы получаете доступ к сокровищу!")
         elif current_room_name == 'hall':
             print("Пьедестал опускается, открывая потайной отсек!")
             if 'treasure_key' not in game_state['player_inventory']:
                 game_state['player_inventory'].append('treasure_key')
                 print("Вы нашли treasure_key!")
+        elif current_room_name == 'library':
+            print("Свиток светится, и вы находите скрытый проход!")
+        elif current_room_name == 'trap_room':
+            print("Плиты пола перестают двигаться. Путь свободен!")
+        elif current_room_name == 'garden':
+            print("Вода в фонтане становится чистой и целебной!")
+
     else:
         print("Неверно. Попробуйте снова.")
 
+        if current_room_name == 'trap_room':
+            print("Неправильный ответ активирует ловушку!")
+            game_state = trigger_trap(game_state)
 
 def attempt_open_treasure(game_state):
     """Логика открытия сундука с сокровищами"""
@@ -79,14 +97,26 @@ def attempt_open_treasure(game_state):
     
     print("Сундук заперт. У вас нет подходящего ключа.")
     choice = get_input("Попробовать ввести код? (да/нет): ")
+
+
     
     if choice.lower() in ['да', 'yes', 'y']:
         if room['puzzle'] is not None:
             question, correct_answer = room['puzzle']
+
+            correct_variants = [correct_answer.lower()]
+
+            if correct_answer == '10':
+                correct_variants.extend(['десять', '10'])
+            elif correct_answer == '7':
+                correct_variants.extend(['семь', '7'])
+            elif correct_answer == '2*5':
+                correct_variants.extend(['2*5', '2 * 5', 'два умножить на пять', 'десять'])
+
             print(f"\n{question}")
             user_code = get_input("Введите код: ")
             
-            if user_code == correct_answer:
+            if user_code in correct_variants: #== correct_answer:
                 print("Код принят! Сундук открывается!")
                 room['items'].remove('treasure_chest')
                 print("В сундуке сокровище! Вы победили!")
@@ -101,16 +131,20 @@ def attempt_open_treasure(game_state):
     else:
         print("Вы отступаете от сундука.")
         return False
-def show_help():
-    print("\nДоступные команды:")
-    print("  go <direction>  - перейти в направлении (north/south/east/west)")
-    print("  look            - осмотреть текущую комнату")
-    print("  take <item>     - поднять предмет")
-    print("  use <item>      - использовать предмет из инвентаря")
-    print("  inventory       - показать инвентарь")
-    print("  solve           - попытаться решить загадку в комнате")
-    print("  quit            - выйти из игры")
-    print("  help            - показать это сообщение")
+
+def show_help(COMMANDS):
+    """
+    Выводит список доступных команд в красивом формате
+    """
+    print("\n" + "=" * 50)
+    print("ДОСТУПНЫЕ КОМАНДЫ:")
+    print("=" * 50)
+
+    for command, description in COMMANDS.items():
+        print(f"{command:<16} - {description}")
+
+    print("=" * 50)
+
 def pseudo_random(seed: int, modulo: int):
     print("seed =", seed, "modulo =", modulo)
     if modulo < 0:

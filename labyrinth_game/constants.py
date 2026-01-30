@@ -1,5 +1,3 @@
-# labyrinth_game/constants.py
-
 ROOMS = {
     'entrance': {
         'description': 'Вы в темном входе лабиринта. Стены покрыты мхом. '
@@ -51,7 +49,7 @@ ROOMS = {
     'treasure_room': {
         'description': 'Комната, на столе большой сундук. Дверь заперта — '
                        'нужен особый ключ.',
-        'exits': {'south': 'hall'},
+        'exits': {'south': 'hall', 'east':'secret_room'},
         'items': ['treasure_chest'],
         'puzzle': (
             'Дверь защищена кодом. Введите код (подсказка: это число '
@@ -81,4 +79,16 @@ ROOMS = {
             'имя'
         )
     }
+}
+
+COMMANDS = {
+    "go <direction>": "перейти в направлении (north/south/east/west)",
+    "look": "осмотреть текущую комнату",
+    "take <item>": "поднять предмет",
+    "use <item>": "использовать предмет из инвентаря",
+    "inventory": "показать инвентарь",
+    "solve": "попытаться решить загадку в комнате",
+    "open": "открыть сундук",
+    "show_help": "показать это сообщение",
+    "quit": "выйти из игры"
 }
